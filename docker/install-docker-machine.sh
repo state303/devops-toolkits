@@ -1,4 +1,3 @@
-"install-docker.sh" 19L, 839C                                                                      19,11         All
 #!/bin/sh
 if [ $(id -u) -ne 0 ] ; then echo "Please run as root" ; exit 1 ; fi
 
