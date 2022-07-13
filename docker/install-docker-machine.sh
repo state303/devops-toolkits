@@ -1,5 +1,5 @@
 #!/bin/sh
-if [ $(id -u) -ne 0 ] ; then echo "Please run as root" ; exit 1 ; fi
+if [ "$(id -u)" -ne 0 ] ; then echo "Please run as root" ; exit 1 ; fi
 
 echo 'removing previous installations...'
 sudo apt-get remove -y docker docker-engine docker.io containerd runc
