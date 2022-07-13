@@ -1,3 +1,3 @@
 # devops-toolkits
 
-A personal repository to serve simple dash script to ansible.
+A personal repository for automations; from simple dash script to ansible.. and much more.
