@@ -2,6 +2,9 @@
 
 if [ "$(id -u)" -ne 0 ] ; then echo "Please run as root" ; exit 1 ; fi
 if [ ! -x "$(command -v docker)" ]; then echo 'docker machine is missing' ; exit 1; fi
+if [ -z "$SONAR_JDBC_URL" ] ; then echo "Missing \$SONAR_JDBC_URL variable set" ; exit 1 ; fi
+if [ -z "$SONAR_JDBC_USERNAME" ] ; then echo "Missing \$SONAR_JDBC_USERNAME variable set" ; exit 1 ; fi
+if [ -z "$SONAR_JDBC_PASSWORD" ] ; then echo "Missing \$SONAR_JDBC_PASSWORD variable set" ; exit 1 ; fi
 
 echo 'setting docker volumes...'
 for NAME in "sonarqube_data" "sonarqube_logs" "sonarqube_extensions"; do
@@ -24,9 +27,9 @@ services:
     depends_on:
       - db
     environment:
-      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonar
-      SONAR_JDBC_USERNAME: sonar
-      SONAR_JDBC_PASSWORD: sonar
+      SONAR_JDBC_URL: $SONAR_JDBC_URL 
+      SONAR_JDBC_USERNAME: $SONAR_JDBC_USERNAME
+      SONAR_JDBC_PASSWORD: $SONAR_JDBC_PASSWORD
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
