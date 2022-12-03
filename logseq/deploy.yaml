@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: logseq
+  name: logseq
+  namespace: logseq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logseq
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: logseq
+    spec:
+      containers:
+      - image: ghcr.io/logseq/logseq-webapp:latest
+        name: logseq-webapp
+        resources: {}
+        ports:
+        - containerPort: 443
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          readOnly: true
+          name: nginx-conf
+        - mountPath: /etc/nginx/certs
+          name: certificates
+          readOnly: true
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf
+            items:
+            - key: logseq-nginx-conf
+              path: ssl.conf
+        - name: certificates
+          secret:
+            optional: false
+            secretName: tls-secret

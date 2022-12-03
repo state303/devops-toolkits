@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: logseq-cert
+  namespace: logseq
+spec:
+  dnsNames:
+  - your.domain.here
+  issuerRef:
+    kind: ClusterIssuer
+    name: your.cluster.issuer.here
+  secretName: tls-secret

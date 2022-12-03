@@ -1,3 +1,5 @@
-# devops-toolkits
+#logseq
 
-A personal repository for automations; from simple dash script to ansible.. and much more.
+Please change cert.yaml to whatever you see fit.
+Also, don't forget to set svc to fit your need as well... :)
+
