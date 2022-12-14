@@ -1,0 +1,58 @@
+test:
+  prometheusAddress: "http://rancher-monitoring-prometheus:9090"
+monitoring:
+  rules:
+    additionalGroups: 
+    - name: additional-loki-rules
+      rules:
+        - record: job:loki_request_duration_seconds_bucket:sum_rate
+          expr: sum(rate(loki_request_duration_seconds_bucket[1m])) by (le, job)
+        - record: job_route:loki_request_duration_seconds_bucket:sum_rate
+          expr: sum(rate(loki_request_duration_seconds_bucket[1m])) by (le, job, route)
+        - record: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate
+          expr: sum(rate(container_cpu_usage_seconds_total[1m])) by (node, namespace, pod, container)
+write:
+  affinity: null # default to hard on node, soft on zone
+  persistence:
+    size: 10Gi
+    storageClass: longhorn
+read:
+  affinity: null # default to hard on node, soft on zone
+  persistence:
+    size: 10Gi
+    storageClass: longhorn
+gateway:
+  ingress:
+    enabled: true
+    ingressClassName: 'nginx'
+    hosts:
+    - host: loki.dsub.io
+      paths:
+      - path: /
+        pathType: ImplementationSpecific
+    tls: []
+minio:
+  enabled: false
+  replicas: 1
+  # Minio requires 2 to 16 drives for erasure code (drivesPerNode * replicas)
+  # https://docs.min.io/docs/minio-erasure-code-quickstart-guide
+  # Since we only have 1 replica, that means 2 drives must be used.
+  drivesPerNode: 2
+  rootUser: enterprise-logs
+  rootPassword: supersecret
+  buckets:
+    - name: chunks
+      policy: none
+      purge: false
+    - name: ruler
+      policy: none
+      purge: false
+    - name: admin
+      policy: none
+      purge: false
+  persistence:
+    size: 100Gi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi

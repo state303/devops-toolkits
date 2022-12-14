@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: monitoring-cert
+  namespace: monitoring
+spec:
+  dnsNames:
+  - prometheus.dsub.io
+  - grafana.dsub.io
+  - alertmanager.dsub.io
+  - loki.dsub.io
+  issuerRef:
+    kind: ClusterIssuer
+    name: cluster-issuer-prod
+  secretName: monitoring-dsub-io-cert
