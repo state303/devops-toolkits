@@ -1,0 +1,73 @@
+---
+- name: Setup haproxy instance
+  hosts: haproxyservers
+  become: true
+  vars:
+    vip: 172.16.100.0
+    nic: eth0
+  tasks:
+    - name: "Install haproxy"
+      ansible.builtin.package:
+        name:
+          - haproxy
+          - keepalived
+        state: present
+    - name: "Setup healthcheck"
+      ansible.builtin.copy:
+        dest: "/etc/keepalived/check_apiserver.sh"
+        mode: 0755
+        content: |
+            #!/bin/sh
+            errorExit() {
+              echo "*** $@" 1>&2
+              exit 1
+            }
+            curl --silent --max-time 2 --insecure https://localhost:6443/ -o /dev/null || errorExit "Error GET https://localhost:6443/"
+            if ip addr | grep -q {{ vip }}; then
+              curl --silent --max-time 2 --insecure https://{{ vip }}:6443/ -o /dev/null || errorExit "Error GET https://{{ vip }}:6443/"
+            fi
+    - name: "Set keepalived configuration"
+      ansible.builtin.copy:
+        dest: "/etc/keepalived/keepalived.conf"
+        mode: 0644
+        content: |
+          vrrp_script check_apiserver {
+            script "/etc/keepalived/check_apiserver.sh"
+            interval 3
+            timeout 10
+            fall 5
+            rise 2
+            weight -2
+          }
+          vrrp_instance VI_1 {
+              state BACKUP
+              interface {{ nic }}
+              virtual_router_id 1
+              priority 100
+              advert_int 5
+              authentication {
+                  auth_type PASS
+                  auth_pass mysecret
+              }
+              virtual_ipaddress {
+                  {{ vip }}
+              }
+              track_script {
+                  check_apiserver
+              }
+          }
+    - name: "Enable keepalived"
+      ansible.builtin.systemd:
+        enabled: true
+        service: keepalived
+        state: started
+    - name: "Copy haproxy configuration"
+      ansible.builtin.copy:
+        dest: /etc/haproxy/haproxy.cfg
+        src: haproxy.cfg
+        mode: 0644
+    - name: "Enable and restart haproxy"
+      ansible.builtin.systemd:
+        enabled: true
+        service: haproxy
+        state: restarted
