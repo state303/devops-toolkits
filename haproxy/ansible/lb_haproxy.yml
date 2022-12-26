@@ -3,7 +3,7 @@
   hosts: haproxyservers
   become: true
   vars:
-    vip: 172.16.100.0
+    vip: 172.16.20.0
     nic: eth0
   tasks:
     - name: "Install haproxy"
