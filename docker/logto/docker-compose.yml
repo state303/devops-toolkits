@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  logto:
+    image: ghcr.io/logto-io/logto:latest
+    ports:
+      - 3001:3001
+      - 3002:3002
+    environments:
+      - TRUST_PROXY_HEADER=1
+      - ENDPOINT
+      - ADMIN_ENDPOINT
+      - DB_URL
