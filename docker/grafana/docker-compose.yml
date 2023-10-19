@@ -1,7 +1,13 @@
-version: "3.9"
+version: '3.9'
 services:
   grafana:
+    image: grafana/grafana-enterprise
     container_name: grafana
-    image: grafana/grafana
+    restart: unless-stopped
+    environment:
+      - GF_SERVER_ROOT
+    user: '0'
     ports:
-      - 3000:3000  
+      - '3000:3000'
+    volumes:
+      - '$PWD/data:/var/lib/grafana'
