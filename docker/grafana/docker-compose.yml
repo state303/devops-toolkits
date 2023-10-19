@@ -10,4 +10,4 @@ services:
     ports:
       - '3000:3000'
     volumes:
-      - '$PWD/data:/var/lib/grafana'
+      - './data:/var/lib/grafana'
